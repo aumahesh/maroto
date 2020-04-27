@@ -163,7 +163,7 @@ func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOf
 	left, top, _, _ := s.pdf.GetMargins()
 
 	s.pdf.SetFont("", "U", 0)
-	s.pdf.SetXY(xColOffset+left, yColOffset+top)
+	s.pdf.SetX(xColOffset+left)
 	s.pdf.WriteLinkID(textProp.Size, text, link)
 	s.pdf.SetFont("", "U", 0)
 }
