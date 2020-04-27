@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"github.com/jung-kurt/gofpdf"
+
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/props"
@@ -24,6 +26,9 @@ type MarotoGridPart interface {
 
 	// Inside Col/Row Components
 	Text(text string, prop ...props.Text)
+
+	//GetFpdf
+	Fpdf() gofpdf.Pdf
 }
 
 // TableList is the abstraction to create a table with header and contents
