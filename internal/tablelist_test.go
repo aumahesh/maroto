@@ -135,7 +135,6 @@ func TestTableList_Create_HappyWithBackgroundColor(t *testing.T) {
 	marotoGrid.On("SetBackgroundColor", mock.Anything).Return(nil)
 	marotoGrid.On("GetPageMargins").Return(10.0, 10.0, 10.0, 10.0)
 	marotoGrid.On("GetPageSize").Return(200.0, 600.0)
-	marotoGrid.On("Fpdf").Return(nil)
 
 	sut := internal.NewTableList(text, font)
 	sut.BindGrid(marotoGrid)

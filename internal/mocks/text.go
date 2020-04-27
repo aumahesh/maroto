@@ -16,6 +16,11 @@ func (_m *Text) Add(text string, cell internal.Cell, textProp props.Text) {
 	_m.Called(text, cell, textProp)
 }
 
+// Add provides a mock function with given fields: text, cell, textProp
+func (_m *Text) AddLink(text string, cell internal.Cell, link int, textProp props.Text) {
+	_m.Called(text, cell, textProp)
+}
+
 // GetLinesQuantity provides a mock function with given fields: text, fontFamily, colWidth
 func (_m *Text) GetLinesQuantity(text string, fontFamily props.Text, colWidth float64) int {
 	ret := _m.Called(text, fontFamily, colWidth)
