@@ -23,6 +23,8 @@ type Maroto interface {
 
 	// Outside Col/Row Components
 	TableList(header []string, contents [][]string, prop ...props.TableList)
+	TableLink(header []string, contents [][]string, links [][]int, prop ...props.TableList)
+
 	Line(spaceHeight float64)
 
 	// Inside Col/Row Components
@@ -57,6 +59,7 @@ type PdfMaroto struct {
 	SignHelper                internal.Signature
 	Image                     internal.Image
 	Code                      internal.Code
+	TableLinkHelper internal.TableLink
 	TableListHelper           internal.TableList
 	pageIndex                 int
 	offsetY                   float64
@@ -92,6 +95,7 @@ func NewMaroto(orientation consts.Orientation, pageSize consts.PageSize) Maroto 
 	code := internal.NewCode(fpdf, math)
 
 	tableList := internal.NewTableList(text, font)
+	tableLink := internal.NewTableLink(text, font)
 
 	maroto := &PdfMaroto{
 		Pdf:             fpdf,
@@ -102,6 +106,7 @@ func NewMaroto(orientation consts.Orientation, pageSize consts.PageSize) Maroto 
 		Image:           image,
 		Code:            code,
 		TableListHelper: tableList,
+		TableLinkHelper: tableLink,
 		pageSize:        pageSize,
 		orientation:     orientation,
 		calculationMode: false,
@@ -109,6 +114,7 @@ func NewMaroto(orientation consts.Orientation, pageSize consts.PageSize) Maroto 
 	}
 
 	maroto.TableListHelper.BindGrid(maroto)
+	maroto.TableLinkHelper.BindGrid(maroto)
 
 	maroto.Font.SetFamily(consts.Arial)
 	maroto.Font.SetStyle(consts.Bold)
@@ -195,6 +201,14 @@ func (s *PdfMaroto) Signature(label string, prop ...props.Font) {
 // Contents are array of arrays. Each array is one line.
 func (s *PdfMaroto) TableList(header []string, contents [][]string, prop ...props.TableList) {
 	s.TableListHelper.Create(header, contents, prop...)
+}
+
+// TableList create a table with multiple rows and columns.
+// Headers define the amount of columns from each row.
+// Headers have bold style, and localized at the top of table.
+// Contents are array of arrays. Each array is one line.
+func (s *PdfMaroto) TableLink(header []string, contents [][]string, links [][]int, prop ...props.TableList) {
+	s.TableLinkHelper.Create(header, contents, links, prop...)
 }
 
 // SetBorder enable the draw of lines in every cell.
@@ -485,4 +499,8 @@ func (s *PdfMaroto) header() {
 	}
 
 	s.SetBackgroundColor(backgroundColor)
+}
+
+func (s *PdfMaroto) Fpdf() gofpdf.Pdf {
+	return s.Pdf
 }

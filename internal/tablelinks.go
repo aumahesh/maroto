@@ -8,62 +8,43 @@ import (
 	"github.com/johnfercher/maroto/pkg/props"
 )
 
-// MarotoGridPart is the abstraction to deal with the gris system inside the table list
-type MarotoGridPart interface {
-	// Grid System
-	Row(height float64, closure func())
-	Col(width uint, closure func())
-	ColSpace(width uint)
-
-	// Helpers
-	SetBackgroundColor(color color.Color)
-	GetCurrentOffset() float64
-	GetPageSize() (width float64, height float64)
-	GetPageMargins() (left float64, top float64, right float64, bottom float64)
-
-	// Outside Col/Row Components
-	Line(spaceHeight float64)
-
-	// Inside Col/Row Components
-	Text(text string, prop ...props.Text)
-
-	//GetFpdf
-	Fpdf() gofpdf.Pdf
-}
-
 // TableList is the abstraction to create a table with header and contents
-type TableList interface {
-	Create(header []string, contents [][]string, prop ...props.TableList)
+type TableLink interface {
+	Create(header []string, contents [][]string, links [][]int, prop ...props.TableList)
 	BindGrid(part MarotoGridPart)
 }
 
-type tableList struct {
+type tableLink struct {
 	pdf  MarotoGridPart
 	text Text
 	font Font
 }
 
 // NewTableList create a TableList
-func NewTableList(text Text, font Font) *tableList {
-	return &tableList{
+func NewTableLink(text Text, font Font) *tableLink {
+	return &tableLink{
 		text: text,
 		font: font,
 	}
 }
 
 // BindGrid bind the grid system to TableList
-func (s *tableList) BindGrid(pdf MarotoGridPart) {
+func (s *tableLink) BindGrid(pdf MarotoGridPart) {
 	s.pdf = pdf
 }
 
 // Create create a header section with a list of strings and
 // create many rows with contents
-func (s *tableList) Create(header []string, contents [][]string, prop ...props.TableList) {
+func (s *tableLink) Create(header []string, contents [][]string, links [][]int, prop ...props.TableList) {
 	if len(header) == 0 {
 		return
 	}
 
 	if len(contents) == 0 {
+		return
+	}
+
+	if len(links) == 0 {
 		return
 	}
 
@@ -93,8 +74,13 @@ func (s *tableList) Create(header []string, contents [][]string, prop ...props.T
 		s.pdf.ColSpace(0)
 	})
 
+	fPdf, ok := s.pdf.Fpdf().(*gofpdf.Fpdf)
+	if !ok {
+		return
+	}
 	// Draw contents
 	for index, content := range contents {
+		link := links[index]
 		contentHeight := s.calcLinesHeight(content, tableProp.ContentProp, tableProp.Align)
 
 		if tableProp.AlternatedBackground != nil && index%2 == 0 {
@@ -104,10 +90,17 @@ func (s *tableList) Create(header []string, contents [][]string, prop ...props.T
 		s.pdf.Row(contentHeight+1, func() {
 			for i, c := range content {
 				cs := c
-
-				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
-					s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
-				})
+				l := link[i]
+				if l == -1 {
+					s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
+						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
+					})
+				} else {
+					fPdf.SetFont(string(tableProp.ContentProp.Family), "U", tableProp.ContentProp.Size)
+					fPdf.WriteLinkID(tableProp.ContentProp.Size, cs, l)
+					fPdf.SetFont("", "", 0)
+					s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {})
+				}
 			}
 		})
 
@@ -121,7 +114,7 @@ func (s *tableList) Create(header []string, contents [][]string, prop ...props.T
 	}
 }
 
-func (s *tableList) calcLinesHeight(textList []string, contentProp props.TableListContent, align consts.Align) float64 {
+func (s *tableLink) calcLinesHeight(textList []string, contentProp props.TableListContent, align consts.Align) float64 {
 	maxLines := 1.0
 
 	left, _, right, _ := s.pdf.GetPageMargins()
