@@ -172,8 +172,9 @@ func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOf
 	if textProp.Align == consts.Right {
 		modifier = 1
 	}
+	//dx := (colWidth - textWidth) / modifier
 
-	dx := (colWidth - textWidth) / modifier
-
-	s.pdf.CellFormat(dx+xColOffset+left, yColOffset+top, text, "", 0, string(textProp.Align), false, link, "")
+	s.pdf.SetFont("", "U", 0)
+	s.pdf.WriteLinkID( yColOffset+top, text, link)
+	s.pdf.SetFont("", "U", 0)
 }
