@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"github.com/jung-kurt/gofpdf"
-
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/props"
@@ -74,10 +72,6 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 		s.pdf.ColSpace(0)
 	})
 
-	fPdf, ok := s.pdf.Fpdf().(*gofpdf.Fpdf)
-	if !ok {
-		return
-	}
 	// Draw contents
 	for index, content := range contents {
 		link := links[index]
@@ -96,10 +90,9 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 					})
 				} else {
-					fPdf.SetFont(string(tableProp.ContentProp.Family), "U", tableProp.ContentProp.Size)
-					fPdf.WriteLinkID(tableProp.ContentProp.Size, cs, l)
-					fPdf.SetFont("", "", 0)
-					s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {})
+					s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
+						s.pdf.TextWithLink(cs, l, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
+					})
 				}
 			}
 		})
