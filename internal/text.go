@@ -167,11 +167,11 @@ func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOf
 		return
 	}
 
-	var modifier float64 = 2
+	//var modifier float64 = 2
 
-	if textProp.Align == consts.Right {
-		modifier = 1
-	}
+	//if textProp.Align == consts.Right {
+	//	modifier = 1
+	//}
 	//dx := (colWidth - textWidth) / modifier
 
 	s.pdf.SetFont("", "U", 0)
