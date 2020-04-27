@@ -10,6 +10,7 @@ import (
 // Text is the abstraction which deals of how to add text inside PDF
 type Text interface {
 	Add(text string, cell Cell, textProp props.Text)
+	AddLink(text string, cell Cell, link int, textProp props.Text)
 	GetLinesQuantity(text string, fontFamily props.Text, colWidth float64) int
 }
 
@@ -58,6 +59,40 @@ func (s *text) Add(text string, cell Cell, textProp props.Text) {
 			textHeight := fontSize / s.font.GetScaleFactor()
 
 			s.addLine(textProp, cell.X, cell.Width, cell.Y+float64(index)*textHeight+accumulateOffsetY, lineWidth, line)
+			accumulateOffsetY += textProp.VerticalPadding
+		}
+	}
+}
+
+func (s *text) AddLink(text string, cell Cell, link int, textProp props.Text) {
+	translator := s.pdf.UnicodeTranslatorFromDescriptor("")
+	s.font.SetFont(textProp.Family, textProp.Style, textProp.Size)
+
+	// duplicated
+	_, _, fontSize := s.font.GetFont()
+	fontHeight := fontSize / s.font.GetScaleFactor()
+
+	cell.Y += fontHeight
+
+	// Apply Unicode before calc spaces
+	unicodeText := translator(text)
+
+	stringWidth := s.pdf.GetStringWidth(unicodeText)
+	words := strings.Split(unicodeText, " ")
+	accumulateOffsetY := 0.0
+
+	// If should add one line
+	if stringWidth < cell.Width || textProp.Extrapolate || len(words) == 1 {
+		s.addLineWithLink(textProp, cell.X, cell.Width, cell.Y, stringWidth, unicodeText, link)
+	} else {
+		lines := s.getLines(words, cell.Width)
+
+		for index, line := range lines {
+			lineWidth := s.pdf.GetStringWidth(line)
+			_, _, fontSize := s.font.GetFont()
+			textHeight := fontSize / s.font.GetScaleFactor()
+
+			s.addLineWithLink(textProp, cell.X, cell.Width, cell.Y+float64(index)*textHeight+accumulateOffsetY, lineWidth, line, link)
 			accumulateOffsetY += textProp.VerticalPadding
 		}
 	}
@@ -122,4 +157,23 @@ func (s *text) addLine(textProp props.Text, xColOffset, colWidth, yColOffset, te
 	dx := (colWidth - textWidth) / modifier
 
 	s.pdf.Text(dx+xColOffset+left, yColOffset+top, text)
+}
+
+func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOffset, textWidth float64, text string, link int) {
+	left, top, _, _ := s.pdf.GetMargins()
+
+	if textProp.Align == consts.Left {
+		s.pdf.Text(xColOffset+left, yColOffset+top, text)
+		return
+	}
+
+	var modifier float64 = 2
+
+	if textProp.Align == consts.Right {
+		modifier = 1
+	}
+
+	dx := (colWidth - textWidth) / modifier
+
+	s.pdf.CellFormat(dx+xColOffset+left, yColOffset+top, text, "", 0, string(textProp.Align), false, link, "")
 }
