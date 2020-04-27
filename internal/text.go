@@ -162,19 +162,7 @@ func (s *text) addLine(textProp props.Text, xColOffset, colWidth, yColOffset, te
 func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOffset, textWidth float64, text string, link int) {
 	left, top, _, _ := s.pdf.GetMargins()
 
-	if textProp.Align == consts.Left {
-		s.pdf.Text(xColOffset+left, yColOffset+top, text)
-		return
-	}
-
-	//var modifier float64 = 2
-
-	//if textProp.Align == consts.Right {
-	//	modifier = 1
-	//}
-	//dx := (colWidth - textWidth) / modifier
-
 	s.pdf.SetFont("", "U", 0)
-	s.pdf.WriteLinkID( yColOffset+top, text, link)
+	s.pdf.CellFormat(xColOffset+left, yColOffset+top, text, "", 0, "", false, link, "") 
 	s.pdf.SetFont("", "U", 0)
 }
