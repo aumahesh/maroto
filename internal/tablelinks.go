@@ -90,9 +90,8 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 					})
 				} else {
-					s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
-						s.pdf.TextWithLink(cs, l, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
-					})
+					s.pdf.TextWithLink(cs, l, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
+					s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {})
 				}
 			}
 		})
