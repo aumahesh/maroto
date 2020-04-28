@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/props"
 	"github.com/jung-kurt/gofpdf"
@@ -10,7 +11,7 @@ import (
 // Text is the abstraction which deals of how to add text inside PDF
 type Text interface {
 	Add(text string, cell Cell, textProp props.Text)
-	AddLink(text string, cell Cell, link int, textProp props.Text)
+	AddTextLink(text string, cell Cell, link int, c color.Color, textProp props.Text)
 	GetLinesQuantity(text string, fontFamily props.Text, colWidth float64) int
 }
 
@@ -64,9 +65,9 @@ func (s *text) Add(text string, cell Cell, textProp props.Text) {
 	}
 }
 
-func (s *text) AddLink(text string, cell Cell, link int, textProp props.Text) {
+func (s *text) AddTextLink(text string, cell Cell, link int, c color.Color, textProp props.Text) {
 	translator := s.pdf.UnicodeTranslatorFromDescriptor("")
-	s.font.SetFont(textProp.Family, textProp.Style, textProp.Size)
+	s.font.SetFont(textProp.Family, "U", textProp.Size)
 
 	// duplicated
 	_, _, fontSize := s.font.GetFont()
@@ -83,7 +84,7 @@ func (s *text) AddLink(text string, cell Cell, link int, textProp props.Text) {
 
 	// If should add one line
 	if stringWidth < cell.Width || textProp.Extrapolate || len(words) == 1 {
-		s.addLineWithLink(textProp, cell.X, cell.Width, cell.Y, stringWidth, unicodeText, link)
+		s.addLineWithLink(textProp, cell.X, cell.Width, cell.Y, stringWidth, fontHeight, unicodeText, link, c)
 	} else {
 		lines := s.getLines(words, cell.Width)
 
@@ -92,7 +93,7 @@ func (s *text) AddLink(text string, cell Cell, link int, textProp props.Text) {
 			_, _, fontSize := s.font.GetFont()
 			textHeight := fontSize / s.font.GetScaleFactor()
 
-			s.addLineWithLink(textProp, cell.X, cell.Width, cell.Y+float64(index)*textHeight+accumulateOffsetY, lineWidth, line, link)
+			s.addLineWithLink(textProp, cell.X, cell.Width, cell.Y+float64(index)*textHeight+accumulateOffsetY, lineWidth, textHeight, line, link, c)
 			accumulateOffsetY += textProp.VerticalPadding
 		}
 	}
@@ -159,11 +160,8 @@ func (s *text) addLine(textProp props.Text, xColOffset, colWidth, yColOffset, te
 	s.pdf.Text(dx+xColOffset+left, yColOffset+top, text)
 }
 
-func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOffset, textWidth float64, text string, link int) {
-	left, _, _, _ := s.pdf.GetMargins()
-
-	s.pdf.SetFont("", "U", 0)
-	s.pdf.SetX(xColOffset+left)
-	s.pdf.WriteLinkID(textProp.Size, text, link)
-	s.pdf.SetFont("", "U", 0)
+func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOffset, textWidth float64, fontHeight float64, text string, link int, c color.Color) {
+	left, top, _, _ := s.pdf.GetMargins()
+	s.addLine(textProp, xColOffset, colWidth, yColOffset, textWidth, text)
+	s.pdf.Link(xColOffset+left, yColOffset+top-fontHeight, textWidth, fontHeight, link)
 }

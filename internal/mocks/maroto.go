@@ -309,7 +309,7 @@ func (_m *Maroto) Text(text string, prop ...props.Text) {
 }
 
 // Text provides a mock function with given fields: text, prop
-func (_m *Maroto) TextWithLink(text string, link int, prop ...props.Text) {
+func (_m *Maroto) TextWithLink(text string, link int, c color.Color, prop ...props.Text) {
 	_va := make([]interface{}, len(prop))
 	for _i := range prop {
 		_va[_i] = prop[_i]

@@ -24,7 +24,7 @@ type MarotoGridPart interface {
 
 	// Inside Col/Row Components
 	Text(text string, prop ...props.Text)
-	TextWithLink(text string, link int, prop ...props.Text)
+	TextWithLink(text string, link int, c color.Color, prop ...props.Text)
 }
 
 // TableList is the abstraction to create a table with header and contents
