@@ -29,7 +29,7 @@ type Maroto interface {
 
 	// Inside Col/Row Components
 	Text(text string, prop ...props.Text)
-	TextWithLink(text string, link int, prop ...props.Text)
+	TextWithLink(text string, link int, c color.Color, prop ...props.Text)
 	FileImage(filePathName string, prop ...props.Rect) (err error)
 	Base64Image(base64 string, extension consts.Extension, prop ...props.Rect) (err error)
 	Barcode(code string, prop ...props.Barcode) error
@@ -348,7 +348,7 @@ func (s *PdfMaroto) Text(text string, prop ...props.Text) {
 }
 
 // Text create a text inside a cell.
-func (s *PdfMaroto) TextWithLink(text string, link int, prop ...props.Text) {
+func (s *PdfMaroto) TextWithLink(text string, link int, c color.Color, prop ...props.Text) {
 	textProp := props.Text{}
 	if len(prop) > 0 {
 		textProp = prop[0]
@@ -367,7 +367,7 @@ func (s *PdfMaroto) TextWithLink(text string, link int, prop ...props.Text) {
 		Height: 0,
 	}
 
-	s.TextHelper.AddLink(text, cell, link, textProp)
+	s.TextHelper.AddTextLink(text, cell, link, c, textProp)
 }
 
 // FileImage add an Image reading from disk inside a cell.
