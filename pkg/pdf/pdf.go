@@ -23,7 +23,7 @@ type Maroto interface {
 
 	// Outside Col/Row Components
 	TableList(header []string, contents [][]string, prop ...props.TableList)
-	TableLink(header []string, contents [][]string, links [][]int, prop ...props.TableList)
+	TableLink(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList)
 
 	Line(spaceHeight float64)
 
@@ -208,8 +208,8 @@ func (s *PdfMaroto) TableList(header []string, contents [][]string, prop ...prop
 // Headers define the amount of columns from each row.
 // Headers have bold style, and localized at the top of table.
 // Contents are array of arrays. Each array is one line.
-func (s *PdfMaroto) TableLink(header []string, contents [][]string, links [][]int, prop ...props.TableList) {
-	s.TableLinkHelper.Create(header, contents, links, prop...)
+func (s *PdfMaroto) TableLink(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList) {
+	s.TableLinkHelper.Create(header, contents, highlightColumn, highlightColor, links, prop...)
 }
 
 // SetBorder enable the draw of lines in every cell.
@@ -223,6 +223,11 @@ func (s *PdfMaroto) SetBorder(on bool) {
 func (s *PdfMaroto) SetBackgroundColor(color color.Color) {
 	s.backgroundColor = color
 	s.Pdf.SetFillColor(s.backgroundColor.Red, s.backgroundColor.Green, s.backgroundColor.Blue)
+}
+
+// SetTextColor
+func (s *PdfMaroto) SetTextColor(color color.Color) {
+	s.Pdf.SetTextColor(color.Red, color.Green, color.Blue)
 }
 
 // GetBorder return the actual border value.

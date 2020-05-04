@@ -262,6 +262,11 @@ func (_m *Maroto) SetBackgroundColor(_a0 color.Color) {
 	_m.Called(_a0)
 }
 
+// SetTextColor provides a mock function with given fields: _a0
+func (_m *Maroto) SetTextColor(_a0 color.Color) {
+	_m.Called(_a0)
+}
+
 // SetBorder provides a mock function with given fields: on
 func (_m *Maroto) SetBorder(on bool) {
 	_m.Called(on)

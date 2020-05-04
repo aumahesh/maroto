@@ -15,6 +15,7 @@ type MarotoGridPart interface {
 
 	// Helpers
 	SetBackgroundColor(color color.Color)
+	SetTextColor(color color.Color)
 	GetCurrentOffset() float64
 	GetPageSize() (width float64, height float64)
 	GetPageMargins() (left float64, top float64, right float64, bottom float64)
