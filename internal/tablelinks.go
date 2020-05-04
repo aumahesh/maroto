@@ -88,16 +88,18 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 			for i, c := range content {
 				cs := c
 				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
+					p := tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0)
 					if i == tableProp.HighlightColumn {
 						s.pdf.SetTextColor(tableProp.HighlightColors[index])
-					}
+						p.Style = consts.Bold
+					} else {}
 					if  link[i] == -1 {
-						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
+						s.pdf.Text(cs, p)
 					} else {
-						s.pdf.TextWithLink(cs, link[i], col, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
+						s.pdf.TextWithLink(cs, link[i], col, p)
 					}
 					if i == tableProp.HighlightColumn {
-						s.pdf.SetTextColor(color.Color{0, 0, 0})
+						s.pdf.SetTextColor(color.Color{0,0,0})
 					}
 				})
 			}
