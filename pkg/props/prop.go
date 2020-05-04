@@ -127,7 +127,7 @@ type TableLink struct {
 	// Line adds a line after every content-row to separate rows. The line's spaceHeight is set to 1.0
 	Line bool
 	// HighlightColumn
-	HightlightColumn int
+	HighlightColumn int
 	// HighlightColors
 	HighlightColors []color.Color
 }
