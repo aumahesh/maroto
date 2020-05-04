@@ -23,7 +23,7 @@ type Maroto interface {
 
 	// Outside Col/Row Components
 	TableList(header []string, contents [][]string, prop ...props.TableList)
-	TableLink(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList)
+	TableLink(header []string, contents [][]string, links [][]int, prop ...props.TableLink)
 
 	Line(spaceHeight float64)
 
@@ -208,8 +208,8 @@ func (s *PdfMaroto) TableList(header []string, contents [][]string, prop ...prop
 // Headers define the amount of columns from each row.
 // Headers have bold style, and localized at the top of table.
 // Contents are array of arrays. Each array is one line.
-func (s *PdfMaroto) TableLink(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList) {
-	s.TableLinkHelper.Create(header, contents, highlightColumn, highlightColor, links, prop...)
+func (s *PdfMaroto) TableLink(header []string, contents [][]string, links [][]int, prop ...props.TableLink) {
+	s.TableLinkHelper.Create(header, contents, links, prop...)
 }
 
 // SetBorder enable the draw of lines in every cell.
