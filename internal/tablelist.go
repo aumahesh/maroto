@@ -6,34 +6,56 @@ import (
 	"github.com/johnfercher/maroto/pkg/props"
 )
 
+// MarotoGridPart is the abstraction to deal with the gris system inside the table list
+type MarotoGridPart interface {
+	// Grid System
+	Row(height float64, closure func())
+	Col(width uint, closure func())
+	ColSpace(width uint)
+
+	// Helpers
+	SetBackgroundColor(color color.Color)
+	SetTextColor(color color.Color)
+	GetCurrentOffset() float64
+	GetPageSize() (width float64, height float64)
+	GetPageMargins() (left float64, top float64, right float64, bottom float64)
+
+	// Outside Col/Row Components
+	Line(spaceHeight float64)
+
+	// Inside Col/Row Components
+	Text(text string, prop ...props.Text)
+	TextWithLink(text string, link int, c color.Color, prop ...props.Text)
+}
+
 // TableList is the abstraction to create a table with header and contents
-type TableLink interface {
-	Create(header []string, contents [][]string, links [][]int, prop ...props.TableLink)
+type TableList interface {
+	Create(header []string, contents [][]string, prop ...props.TableList)
 	BindGrid(part MarotoGridPart)
 }
 
-type tableLink struct {
+type tableList struct {
 	pdf  MarotoGridPart
 	text Text
 	font Font
 }
 
 // NewTableList create a TableList
-func NewTableLink(text Text, font Font) *tableLink {
-	return &tableLink{
+func NewTableList(text Text, font Font) *tableList {
+	return &tableList{
 		text: text,
 		font: font,
 	}
 }
 
 // BindGrid bind the grid system to TableList
-func (s *tableLink) BindGrid(pdf MarotoGridPart) {
+func (s *tableList) BindGrid(pdf MarotoGridPart) {
 	s.pdf = pdf
 }
 
 // Create create a header section with a list of strings and
 // create many rows with contents
-func (s *tableLink) Create(header []string, contents [][]string, links [][]int, prop ...props.TableLink) {
+func (s *tableList) Create(header []string, contents [][]string, prop ...props.TableList) {
 	if len(header) == 0 {
 		return
 	}
@@ -42,11 +64,7 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 		return
 	}
 
-	if len(links) == 0 {
-		return
-	}
-
-	tableProp := props.TableLink{}
+	tableProp := props.TableList{}
 
 	if len(prop) > 0 {
 		tableProp = prop[0]
@@ -72,40 +90,26 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 		s.pdf.ColSpace(0)
 	})
 
-	var col color.Color
-
 	// Draw contents
 	for index, content := range contents {
-		link := links[index]
 		contentHeight := s.calcLinesHeight(content, tableProp.ContentProp, tableProp.Align)
 
 		if tableProp.AlternatedBackground != nil && index%2 == 0 {
-			col = *tableProp.AlternatedBackground
-			s.pdf.SetBackgroundColor(col)
+			s.pdf.SetBackgroundColor(*tableProp.AlternatedBackground)
 		}
 
 		s.pdf.Row(contentHeight+1, func() {
 			for i, c := range content {
 				cs := c
+
 				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
-					if i == tableProp.HightlightColumn {
-						s.pdf.SetTextColor(tableProp.HighlightColors[index])
-					}
-					if  link[i] == -1 {
-						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
-					} else {
-						s.pdf.TextWithLink(cs, link[i], col, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
-					}
-					if i == tableProp.HightlightColumn {
-						s.pdf.SetTextColor(color.Color{255, 255, 255})
-					}
+					s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 				})
 			}
 		})
 
 		if tableProp.AlternatedBackground != nil && index%2 == 0 {
-			col = color.NewWhite()
-			s.pdf.SetBackgroundColor(col)
+			s.pdf.SetBackgroundColor(color.NewWhite())
 		}
 
 		if tableProp.Line {
@@ -114,7 +118,7 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 	}
 }
 
-func (s *tableLink) calcLinesHeight(textList []string, contentProp props.TableListContent, align consts.Align) float64 {
+func (s *tableList) calcLinesHeight(textList []string, contentProp props.TableListContent, align consts.Align) float64 {
 	maxLines := 1.0
 
 	left, _, right, _ := s.pdf.GetPageMargins()
