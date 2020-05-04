@@ -97,7 +97,7 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 						s.pdf.TextWithLink(cs, link[i], col, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 					}
 					if i == tableProp.HighlightColumn {
-						s.pdf.SetTextColor(color.Color{255, 255, 255})
+						s.pdf.SetTextColor(color.Color{0, 0, 0})
 					}
 				})
 			}
