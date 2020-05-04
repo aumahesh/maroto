@@ -8,7 +8,7 @@ import (
 
 // TableList is the abstraction to create a table with header and contents
 type TableLink interface {
-	Create(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList)
+	Create(header []string, contents [][]string, links [][]int, prop ...props.TableLink)
 	BindGrid(part MarotoGridPart)
 }
 
@@ -33,7 +33,7 @@ func (s *tableLink) BindGrid(pdf MarotoGridPart) {
 
 // Create create a header section with a list of strings and
 // create many rows with contents
-func (s *tableLink) Create(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList) {
+func (s *tableLink) Create(header []string, contents [][]string, links [][]int, prop ...props.TableLink) {
 	if len(header) == 0 {
 		return
 	}
@@ -46,7 +46,7 @@ func (s *tableLink) Create(header []string, contents [][]string, highlightColumn
 		return
 	}
 
-	tableProp := props.TableList{}
+	tableProp := props.TableLink{}
 
 	if len(prop) > 0 {
 		tableProp = prop[0]
@@ -88,15 +88,15 @@ func (s *tableLink) Create(header []string, contents [][]string, highlightColumn
 			for i, c := range content {
 				cs := c
 				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
-					if i == highlightColumn {
-						s.pdf.SetTextColor(highlightColor)
+					if i == tableProp.HighlightColumn {
+						s.pdf.SetTextColor(tableProp.HighlightColors[index])
 					}
 					if  link[i] == -1 {
 						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 					} else {
 						s.pdf.TextWithLink(cs, link[i], col, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 					}
-					if i == highlightColumn {
+					if i == tableProp.HighlightColumn {
 						s.pdf.SetTextColor(color.Color{255, 255, 255})
 					}
 				})
