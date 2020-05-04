@@ -108,6 +108,30 @@ type TableList struct {
 	Line bool
 }
 
+// TableList represents properties from a TableList
+type TableLink struct {
+	// HeaderProp is the custom properties of the text inside
+	// the headers
+	HeaderProp TableListContent
+	// ContentProp is the custom properties of the text inside
+	// the contents
+	ContentProp TableListContent
+	// Align is the align of the text (header and content) inside the columns
+	Align consts.Align
+	// AlternatedBackground define the background color from even rows
+	// i.e rows with index (0, 2, 4, ..., N) will have background colorized,
+	// rows with index (1, 3, 5, ..., N) will not
+	AlternatedBackground *color.Color
+	// HeaderContentSpace is the space between the header and the contents
+	HeaderContentSpace float64
+	// Line adds a line after every content-row to separate rows. The line's spaceHeight is set to 1.0
+	Line bool
+	// HighlightColumn
+	HightlightColumn int
+	// HighlightColors
+	HighlightColors []color.Color
+}
+
 // MakeValid from Rect will make the properties from a rectangle reliable to fit inside a cell
 // and define default values for a rectangle
 func (s *Rect) MakeValid() {
@@ -242,6 +266,59 @@ func (s *TableListContent) ToTextProp(align consts.Align, top float64, extrapola
 
 // MakeValid from TableList define default values for a TableList
 func (s *TableList) MakeValid(header []string, contents [][]string) {
+	if s.HeaderProp.Size == 0.0 {
+		s.HeaderProp.Size = 10.0
+	}
+
+	if s.HeaderProp.Family == "" {
+		s.HeaderProp.Family = consts.Arial
+	}
+
+	if s.HeaderProp.Style == "" {
+		s.HeaderProp.Style = consts.Bold
+	}
+
+	if len(s.HeaderProp.GridSizes) == 0 {
+		gridSize := uint(12.0 / len(header))
+		s.HeaderProp.GridSizes = []uint{}
+
+		for range header {
+			s.HeaderProp.GridSizes = append(s.HeaderProp.GridSizes, gridSize)
+		}
+	}
+
+	if s.Align == "" {
+		s.Align = consts.Left
+	}
+
+	if s.ContentProp.Size == 0.0 {
+		s.ContentProp.Size = 10.0
+	}
+
+	if s.ContentProp.Family == "" {
+		s.ContentProp.Family = consts.Arial
+	}
+
+	if s.ContentProp.Style == "" {
+		s.ContentProp.Style = consts.Normal
+	}
+
+	if len(s.ContentProp.GridSizes) == 0 {
+		gridSize := uint(12.0 / len(header))
+		s.ContentProp.GridSizes = []uint{}
+
+		for range header {
+			s.ContentProp.GridSizes = append(s.ContentProp.GridSizes, gridSize)
+		}
+	}
+
+	if s.HeaderContentSpace == 0.0 {
+		s.HeaderContentSpace = 4.0
+	}
+}
+
+// MakeValid from TableList define default values for a TableList
+func (s *TableLink) MakeValid(header []string, contents [][]string) {
 	if s.HeaderProp.Size == 0.0 {
 		s.HeaderProp.Size = 10.0
 	}
