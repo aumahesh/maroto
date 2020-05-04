@@ -8,7 +8,7 @@ import (
 
 // TableList is the abstraction to create a table with header and contents
 type TableLink interface {
-	Create(header []string, contents [][]string, links [][]int, prop ...props.TableList)
+	Create(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList)
 	BindGrid(part MarotoGridPart)
 }
 
@@ -33,7 +33,7 @@ func (s *tableLink) BindGrid(pdf MarotoGridPart) {
 
 // Create create a header section with a list of strings and
 // create many rows with contents
-func (s *tableLink) Create(header []string, contents [][]string, links [][]int, prop ...props.TableList) {
+func (s *tableLink) Create(header []string, contents [][]string, highlightColumn int, highlightColor color.Color, links [][]int, prop ...props.TableList) {
 	if len(header) == 0 {
 		return
 	}
@@ -88,10 +88,16 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 			for i, c := range content {
 				cs := c
 				s.pdf.Col(tableProp.ContentProp.GridSizes[i], func() {
+					if i == highlightColumn {
+						s.pdf.SetTextColor(highlightColor)
+					}
 					if  link[i] == -1 {
 						s.pdf.Text(cs, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
 					} else {
 						s.pdf.TextWithLink(cs, link[i], col, tableProp.ContentProp.ToTextProp(tableProp.Align, 0, false, 0.0))
+					}
+					if i == highlightColumn {
+						s.pdf.SetTextColor(color.Color{255, 255, 255})
 					}
 				})
 			}
