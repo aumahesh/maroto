@@ -67,7 +67,7 @@ func (s *text) Add(text string, cell Cell, textProp props.Text) {
 
 func (s *text) AddTextLink(text string, cell Cell, link int, c color.Color, textProp props.Text) {
 	translator := s.pdf.UnicodeTranslatorFromDescriptor("")
-	s.font.SetFont(textProp.Family, "U", textProp.Size)
+	s.font.SetFont(textProp.Family, "BU", textProp.Size)
 
 	// duplicated
 	_, _, fontSize := s.font.GetFont()
