@@ -130,6 +130,8 @@ type TableLink struct {
 	HighlightColumn int
 	// HighlightColors
 	HighlightColors []color.Color
+	// LinkColor
+	LinkColor color.Color
 }
 
 // MakeValid from Rect will make the properties from a rectangle reliable to fit inside a cell
