@@ -83,7 +83,7 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 			col = *tableProp.AlternatedBackground
 			s.pdf.SetBackgroundColor(col)
 		}
-
+		
 		s.pdf.Row(contentHeight+1, func() {
 			for i, c := range content {
 				cs := c
@@ -96,7 +96,7 @@ func (s *tableLink) Create(header []string, contents [][]string, links [][]int, 
 					if  link[i] == -1 {
 						s.pdf.Text(cs, p)
 					} else {
-						s.pdf.TextWithLink(cs, link[i], col, p)
+						s.pdf.TextWithLink(cs, link[i], tableProp.LinkColor, p)
 					}
 					if i == tableProp.HighlightColumn {
 						s.pdf.SetTextColor(color.Color{0,0,0})

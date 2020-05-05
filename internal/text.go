@@ -161,7 +161,9 @@ func (s *text) addLine(textProp props.Text, xColOffset, colWidth, yColOffset, te
 }
 
 func (s *text) addLineWithLink(textProp props.Text, xColOffset, colWidth, yColOffset, textWidth float64, fontHeight float64, text string, link int, c color.Color) {
+	s.pdf.SetTextColor(c.Red, c.Green, c.Blue)
 	left, top, _, _ := s.pdf.GetMargins()
 	s.addLine(textProp, xColOffset, colWidth, yColOffset, textWidth, text)
 	s.pdf.Link(xColOffset+left, yColOffset+top-fontHeight, textWidth, fontHeight, link)
+	s.pdf.SetTextColor(0,0,0)
 }
